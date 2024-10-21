@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_REPO = "sloopstash"
+        DOCKER_REPO = "karthik2502"
         CREDENTIALS_ID = "dockerhub_credentials"
     }
     stages {

@@ -31,7 +31,7 @@ pipeline {
 
                                 // Build Docker image
                                 sh """
-                                    cd kickstart-docker/test-image
+                                    pwd
                                     echo "Building ${DOCKER_REPO}/${imageTag}"
                                     sudo docker build -t ${DOCKER_REPO}/${imageTag} -f ${dockerfilePath} ${contextPath}
                                 """

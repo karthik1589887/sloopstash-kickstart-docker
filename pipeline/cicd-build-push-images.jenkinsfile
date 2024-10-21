@@ -1,1 +1,174 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_REPO = "mydockerhub"
+        CREDENTIALS_ID = "dockerhub_credentials"
+        LOG_FILE = "pipeline_output.log"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from the repository
+                git url: 'https://github.com/karthik1589887/sloopstash-kickstart-docker'
+                
+                // Initialize the log file
+                sh "echo 'Pipeline Log Start' > ${LOG_FILE}"
+            }
+        }
+        stage('Prepare Build Contexts') {
+            steps {
+                script {
+                    // List top-level directories
+                    def folders = sh(script: "ls -d */", returnStdout: true).trim().split('\n')
+                    
+                    // Iterate through folders and prepare for build
+                    folders.each { folder ->
+                        def versions = sh(script: "ls ${folder}", returnStdout: true).trim().split('\n')
+                        versions.each { version ->
+                            def imageName = folder.replace('/', '')  // e.g., 'ansible'
+                            def imageTag = "${imageName}:${version}" // e.g., 'ansible:2.9'
+                            def buildContext = "${folder}${version}"  // Path to the Docker build context
 
+                            // Append to log
+                            sh "echo 'Preparing build for ${imageTag} from ${buildContext}' >> ${LOG_FILE}"
+                        }
+                    }
+                }
+            }
+        }
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    def folders = sh(script: "ls -d */", returnStdout: true).trim().split('\n')
+                    
+                    folders.each { folder ->
+                        def versions = sh(script: "ls ${folder}", returnStdout: true).trim().split('\n')
+                        
+                        versions.each { version ->
+                            def imageName = folder.replace('/', '')  // e.g., 'ansible'
+                            def imageTag = "${imageName}:${version}" // e.g., 'ansible:2.9'
+                            def buildContext = "${folder}${version}"  // Path to the Docker build context
+
+                            // Build Docker image and log output
+                            sh """
+                                echo 'Building ${DOCKER_REPO}/${imageTag}' >> ${LOG_FILE}
+                                docker build -t ${DOCKER_REPO}/${imageTag} ${buildContext} >> ${LOG_FILE} 2>&1
+                                echo 'Built ${imageTag}' >> ${LOG_FILE}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+        stage('Push Docker Images') {
+            steps {
+                script {
+                    def folders = sh(script: "ls -d */", returnStdout: true).trim().split('\n')
+                    
+                    folders.each { folder ->
+                        def versions = sh(script: "ls ${folder}", returnStdout: true).trim().split('\n')
+                        
+                        versions.each { version ->
+                            def imageName = folder.replace('/', '')  // e.g., 'ansible'
+                            def imageTag = "${imageName}:${version}" // e.g., 'ansible:2.9'
+
+                            // Push Docker image to the registry
+                            sh """
+                                echo 'Pushing ${DOCKER_REPO}/${imageTag}' >> ${LOG_FILE}
+                                docker login -u \$(cat /path/to/docker-username) -p \$(cat /path/to/docker-password) >> ${LOG_FILE} 2>&1
+                                docker push ${DOCKER_REPO}/${imageTag} >> ${LOG_FILE} 2>&1
+                                echo 'Pushed ${imageTag}' >> ${LOG_FILE}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            // Archive the log file for review
+            archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
+        }
+    }
+}
+
+
+
+---------------------------------------------
+
+
+pipeline {
+    agent any
+    environment {
+        DOCKER_REPO = "karthik2502"
+        CREDENTIALS_ID = "dockerhub_credentials"
+    }
+    stages {
+        stage('CI: Download sources') {
+            steps {
+                sh 'git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker'
+            }
+        }
+        stage('CI: Build OCI images') {
+            steps {
+                dir('kickstart-docker/test-image') {
+                    script {
+                        // List top-level directories (e.g., base, nginx, python, redis)
+                        def folders = sh(script: "ls -d image/*/", returnStdout: true).trim().split('\n')
+
+                        // Loop through each folder
+                        folders.each { folder ->
+                            // List all versions inside each folder
+                            def versions = sh(script: "ls ${folder}", returnStdout: true).trim().split('\n')
+
+                            // Loop through each version
+                            versions.each { version ->
+                                def imageName = folder.replace('image/', '').replace('/', '')  // e.g., 'nginx'
+                                def imageTag = "${imageName}:${version}"  // e.g., 'nginx:1.14.0'
+                                def dockerfilePath = "${folder}${version}/amazon-linux-2.dockerfile"
+                                def buildContext = "${folder}${version}/context"
+
+                                // Build Docker image
+                                sh """
+                                    echo 'Building ${DOCKER_REPO}/${imageTag}'
+                                    sudo docker image build -t ${DOCKER_REPO}/${imageTag} -f ${dockerfilePath} ${buildContext}
+                                """
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('CI: Push OCI images') {
+            steps {
+                script {
+                    // Push all images after building
+                    def folders = sh(script: "ls -d image/*/", returnStdout: true).trim().split('\n')
+
+                    folders.each { folder ->
+                        def versions = sh(script: "ls ${folder}", returnStdout: true).trim().split('\n')
+
+                        versions.each { version ->
+                            def imageName = folder.replace('image/', '').replace('/', '')  // e.g., 'nginx'
+                            def imageTag = "${imageName}:${version}"
+
+                            // Push Docker image
+                            sh """
+                                echo 'Pushing ${DOCKER_REPO}/${imageTag}'
+                                sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
+                                sudo docker push ${DOCKER_REPO}/${imageTag}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Cleaning up...'
+            sh 'sudo docker system prune -f'
+        }
+    }
+}

@@ -8,7 +8,7 @@ pipeline {
         stage('CI: Download sources') {
             steps {
                 sh(
-          script:'git clone https://github.com/sloopstash/kickstart-docker.git kickstart-docker',
+          script:'git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker',
           returnStatus:true
         )
             }

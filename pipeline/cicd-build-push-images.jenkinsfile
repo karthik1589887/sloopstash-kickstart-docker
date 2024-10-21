@@ -17,6 +17,8 @@ pipeline {
             steps {
                 dir('kickstart-docker/test-image') {
                     script {
+                        def images_test = sh(script: "ls", returnStdout: true).trim().split('\n')
+                        def images_pwd = sh(script: "pwd", returnStdout: true).trim().split('\n')
                         def images = sh(script: "ls -d */", returnStdout: true).trim().split('\n')
 
                         images.each { imageFolder ->

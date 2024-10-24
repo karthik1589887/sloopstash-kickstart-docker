@@ -6,11 +6,11 @@ pipeline {
     DOCKER_PASS = "Work4@fun"
     }
     stages {
-    	stage('CI: Download sources') {
+        stage('CI: Download sources') {
         steps {
           sh 'git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker'
           returnStatus:true
-				}
+        }
       }
       stage('CI: Build and Push Docker Images') {
         steps {
@@ -36,7 +36,7 @@ pipeline {
               sh """
                 echo "Building ${DOCKER_REPO}/${imageTag}"
                 sudo docker build -t ${DOCKER_REPO}/${imageTag} -f ${dockerfilePath} ${contextPath}
-              	"""
+                """
 
               // Push Docker image
               sh """

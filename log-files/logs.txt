@@ -1,0 +1,395 @@
+Started by user Tuto
+Obtained pipeline/cicd-build-push-images.jenkinsfile from git https://github.com/karthik1589887/sloopstash-kickstart-docker
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/lib/jenkins/workspace/CICD-Build-Push/Test
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/CICD-Build-Push/Test/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/karthik1589887/sloopstash-kickstart-docker # timeout=10
+Fetching upstream changes from https://github.com/karthik1589887/sloopstash-kickstart-docker
+ > git --version # timeout=10
+ > git --version # 'git version 2.17.1'
+ > git fetch --tags --progress -- https://github.com/karthik1589887/sloopstash-kickstart-docker +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision 5edc7c60c356320cbfe67a4649f50469c6ad1b9d (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 5edc7c60c356320cbfe67a4649f50469c6ad1b9d # timeout=10
+Commit message: "Update cicd-build-push-images.jenkinsfile"
+ > git rev-list --no-walk f42a85f81f6aa95b1a19785b3a6a04f80526afc6 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (CI: Download sources)
+[Pipeline] sh
++ git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker
+fatal: destination path 'kickstart-docker' already exists and is not an empty directory.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (CI: Build and Push Docker Images)
+[Pipeline] dir
+Running in /var/lib/jenkins/workspace/CICD-Build-Push/Test/kickstart-docker/test-image
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $DOCKER_USER or $DOCKER_PASS
+[Pipeline] {
+[Pipeline] sh
++ ls -d nginx/ redis/
+[Pipeline] sh
++ ls nginx/
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_USER]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ echo Building ****/nginx:1.14.0
+Building ****/nginx:1.14.0
++ sudo docker build -t ****/nginx:1.14.0 -f nginx/1.14.0/amazon-linux-2.dockerfile nginx/1.14.0/context
+#1 [internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from amazon-linux-2.dockerfile
+#2 transferring dockerfile: 1.05kB 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/sloopstash/base:v1.1.1
+#3 DONE 0.0s
+
+#4 [1/5] FROM docker.io/sloopstash/base:v1.1.1
+#4 DONE 0.0s
+
+#5 [2/5] WORKDIR /tmp
+#5 CACHED
+
+#6 [3/5] RUN set -x   && wget https://nginx.org/packages/rhel/7/x86_64/RPMS/nginx-1.14.0-1.el7_4.ngx.x86_64.rpm --quiet   && yum install -y nginx-1.14.0-1.el7_4.ngx.x86_64.rpm   && rm -f nginx-1.14.0-1.el7_4.ngx.x86_64.rpm
+#6 CACHED
+
+#7 [4/5] RUN set -x   && mkdir /opt/app   && mkdir /opt/app/source   && mkdir /opt/nginx   && mkdir /opt/nginx/log   && mkdir /opt/nginx/conf   && mkdir /opt/nginx/script   && mkdir /opt/nginx/system   && touch /opt/nginx/log/access.log   && touch /opt/nginx/log/error.log   && touch /opt/nginx/conf/server.conf   && touch /opt/nginx/conf/app.conf   && touch /opt/nginx/system/server.pid   && touch /opt/nginx/system/supervisor.ini   && ln -s /opt/nginx/conf/app.conf /etc/nginx/conf.d/app.conf   && ln -s /opt/nginx/system/supervisor.ini /etc/supervisord.d/nginx.ini   && history -c
+#7 CACHED
+
+#8 [5/5] WORKDIR /opt/nginx
+#8 CACHED
+
+#9 exporting to image
+#9 exporting layers done
+#9 writing image sha256:eb581cf621b8aac026a41c1e5428e797696a960fe1b77d3782cb1d7b32e45d95 done
+#9 naming to docker.io/****/nginx:1.14.0 done
+#9 DONE 0.0s
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_USER, DOCKER_PASS]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ echo Pushing ****/nginx:1.14.0
+Pushing ****/nginx:1.14.0
++ sudo docker login -u **** -p ****
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+WARNING! Your password will be stored unencrypted in /var/lib/jenkins/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
++ sudo docker push ****/nginx:1.14.0
+The push refers to repository [docker.io/****/nginx]
+5f70bf18a086: Preparing
+abb74e8adffc: Preparing
+81cebd698560: Preparing
+5f70bf18a086: Preparing
+0abe8dd131e9: Preparing
+2ef04ad74186: Preparing
+2fa9c904d3b3: Preparing
+2fa9c904d3b3: Waiting
+81cebd698560: Layer already exists
+abb74e8adffc: Layer already exists
+5f70bf18a086: Layer already exists
+0abe8dd131e9: Layer already exists
+2ef04ad74186: Layer already exists
+2fa9c904d3b3: Layer already exists
+1.14.0: digest: sha256:8108953828499261f4357d823568ff09dad4fe8f357fcd3af53cb169535f1156 size: 1784
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_USER]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ echo Building ****/nginx:1.24.0
+Building ****/nginx:1.24.0
++ sudo docker build -t ****/nginx:1.24.0 -f nginx/1.24.0/amazon-linux-2.dockerfile nginx/1.24.0/context
+#1 [internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from amazon-linux-2.dockerfile
+#2 transferring dockerfile: 1.04kB 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/sloopstash/base:v1.1.1
+#3 DONE 0.0s
+
+#4 [1/5] FROM docker.io/sloopstash/base:v1.1.1
+#4 DONE 0.0s
+
+#5 [2/5] WORKDIR /tmp
+#5 CACHED
+
+#6 [4/5] RUN set -x   && mkdir /opt/app   && mkdir /opt/app/source   && mkdir /opt/nginx   && mkdir /opt/nginx/log   && mkdir /opt/nginx/conf   && mkdir /opt/nginx/script   && mkdir /opt/nginx/system   && touch /opt/nginx/log/access.log   && touch /opt/nginx/log/error.log   && touch /opt/nginx/conf/server.conf   && touch /opt/nginx/conf/app.conf   && touch /opt/nginx/system/server.pid   && touch /opt/nginx/system/supervisor.ini   && ln -s /opt/nginx/conf/app.conf /etc/nginx/conf.d/app.conf   && ln -s /opt/nginx/system/supervisor.ini /etc/supervisord.d/nginx.ini   && history -c
+#6 CACHED
+
+#7 [3/5] RUN set -x   && wget https://nginx.org/packages/rhel/7/x86_64/RPMS/nginx-1.24.0-1.el7.ngx.x86_64.rpm --quiet   && yum install -y nginx-1.24.0-1.el7.ngx.x86_64.rpm   && rm -f nginx-1.24.0-1.el7.ngx.x86_64.rpm
+#7 CACHED
+
+#8 [5/5] WORKDIR /opt/nginx
+#8 CACHED
+
+#9 exporting to image
+#9 exporting layers done
+#9 writing image sha256:27fa7014d4b2c9621158a09bcb023a1e099913f7ef8aa13b61b1a59566840a21 done
+#9 naming to docker.io/****/nginx:1.24.0 done
+#9 DONE 0.0s
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_USER, DOCKER_PASS]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ echo Pushing ****/nginx:1.24.0
+Pushing ****/nginx:1.24.0
++ sudo docker login -u **** -p ****
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+WARNING! Your password will be stored unencrypted in /var/lib/jenkins/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
++ sudo docker push ****/nginx:1.24.0
+The push refers to repository [docker.io/****/nginx]
+5f70bf18a086: Preparing
+b6619f62e202: Preparing
+60730ee4b00e: Preparing
+5f70bf18a086: Preparing
+0abe8dd131e9: Preparing
+2ef04ad74186: Preparing
+2fa9c904d3b3: Preparing
+2fa9c904d3b3: Waiting
+60730ee4b00e: Layer already exists
+b6619f62e202: Layer already exists
+5f70bf18a086: Layer already exists
+0abe8dd131e9: Layer already exists
+2ef04ad74186: Layer already exists
+2fa9c904d3b3: Layer already exists
+1.24.0: digest: sha256:e547af5fe13cce8b2c9aaa308024d696a72a73ede95429b00e48664a51782754 size: 1785
+[Pipeline] sh
++ ls redis/
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_USER]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ echo Building ****/redis:4.0.9
+Building ****/redis:4.0.9
++ sudo docker build -t ****/redis:4.0.9 -f redis/4.0.9/amazon-linux-2.dockerfile redis/4.0.9/context
+#1 [internal] load build definition from amazon-linux-2.dockerfile
+#1 transferring dockerfile: 928B done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 transferring context: 2B 0.0s done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/sloopstash/base:v1.1.1
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.io/sloopstash/base:v1.1.1
+#4 DONE 0.0s
+
+#5 [3/9] WORKDIR /tmp
+#5 CACHED
+
+#6 [4/9] RUN set -x   && wget http://download.redis.io/releases/redis-4.0.9.tar.gz --quiet   && tar xvzf redis-4.0.9.tar.gz > /dev/null
+#6 CACHED
+
+#7 [5/9] WORKDIR redis-4.0.9
+#7 CACHED
+
+#8 [7/9] WORKDIR ../
+#8 CACHED
+
+#9 [6/9] RUN set -x   && make distclean   && make   && make install
+#9 CACHED
+
+#10 [2/9] RUN yum install -y tcl
+#10 CACHED
+
+#11 [8/9] RUN set -x   && rm -rf redis-4.0.9*   && mkdir /opt/redis   && mkdir /opt/redis/data   && mkdir /opt/redis/log   && mkdir /opt/redis/conf   && mkdir /opt/redis/script   && mkdir /opt/redis/system   && touch /opt/redis/system/server.pid   && touch /opt/redis/system/supervisor.ini   && ln -s /opt/redis/system/supervisor.ini /etc/supervisord.d/redis.ini   && history -c
+#11 CACHED
+
+#12 [9/9] WORKDIR /opt/redis
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 writing image sha256:1edb5445c20ec06290aaf5a0ffd1da854818202daadf541bf52a0eab04c60bf9 done
+#13 naming to docker.io/****/redis:4.0.9 done
+#13 DONE 0.0s
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_USER, DOCKER_PASS]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ echo Pushing ****/redis:4.0.9
+Pushing ****/redis:4.0.9
++ sudo docker login -u **** -p ****
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+WARNING! Your password will be stored unencrypted in /var/lib/jenkins/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
++ sudo docker push ****/redis:4.0.9
+The push refers to repository [docker.io/****/redis]
+5f70bf18a086: Preparing
+c3e4c3b4b649: Preparing
+5f70bf18a086: Preparing
+74abf6a47a17: Preparing
+5f70bf18a086: Preparing
+fe0f13f6c2fc: Preparing
+5f70bf18a086: Preparing
+00ce94904987: Preparing
+0abe8dd131e9: Preparing
+2ef04ad74186: Preparing
+2fa9c904d3b3: Preparing
+0abe8dd131e9: Waiting
+2ef04ad74186: Waiting
+2fa9c904d3b3: Waiting
+c3e4c3b4b649: Layer already exists
+74abf6a47a17: Layer already exists
+5f70bf18a086: Layer already exists
+fe0f13f6c2fc: Layer already exists
+00ce94904987: Layer already exists
+2ef04ad74186: Layer already exists
+0abe8dd131e9: Layer already exists
+2fa9c904d3b3: Layer already exists
+4.0.9: digest: sha256:391bfcf0dd3e5384fe86592b8da826c7910da3efc7bdcd480abcf57c53a1fe0c size: 2619
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_USER]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ echo Building ****/redis:7.2.1
+Building ****/redis:7.2.1
++ sudo docker build -t ****/redis:7.2.1 -f redis/7.2.1/amazon-linux-2.dockerfile redis/7.2.1/context
+#1 [internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from amazon-linux-2.dockerfile
+#2 transferring dockerfile: 928B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/sloopstash/base:v1.1.1
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.io/sloopstash/base:v1.1.1
+#4 DONE 0.0s
+
+#5 [8/9] RUN set -x   && rm -rf redis-7.2.1*   && mkdir /opt/redis   && mkdir /opt/redis/data   && mkdir /opt/redis/log   && mkdir /opt/redis/conf   && mkdir /opt/redis/script   && mkdir /opt/redis/system   && touch /opt/redis/system/server.pid   && touch /opt/redis/system/supervisor.ini   && ln -s /opt/redis/system/supervisor.ini /etc/supervisord.d/redis.ini   && history -c
+#5 CACHED
+
+#6 [6/9] RUN set -x   && make distclean   && make   && make install
+#6 CACHED
+
+#7 [4/9] RUN set -x   && wget http://download.redis.io/releases/redis-7.2.1.tar.gz --quiet   && tar xvzf redis-7.2.1.tar.gz > /dev/null
+#7 CACHED
+
+#8 [7/9] WORKDIR ../
+#8 CACHED
+
+#9 [2/9] RUN yum install -y tcl
+#9 CACHED
+
+#10 [3/9] WORKDIR /tmp
+#10 CACHED
+
+#11 [5/9] WORKDIR redis-7.2.1
+#11 CACHED
+
+#12 [9/9] WORKDIR /opt/redis
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 writing image sha256:518692cbdc187077a3ea46be52360319b80973e5dba97be0ad2f8638bfe46f52 done
+#13 naming to docker.io/****/redis:7.2.1 done
+#13 DONE 0.0s
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_USER, DOCKER_PASS]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ echo Pushing ****/redis:7.2.1
+Pushing ****/redis:7.2.1
++ sudo docker login -u **** -p ****
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+WARNING! Your password will be stored unencrypted in /var/lib/jenkins/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
++ sudo docker push ****/redis:7.2.1
+The push refers to repository [docker.io/****/redis]
+5f70bf18a086: Preparing
+63cace160565: Preparing
+5f70bf18a086: Preparing
+780ab37d2c9e: Preparing
+5f70bf18a086: Preparing
+180e4c252d03: Preparing
+5f70bf18a086: Preparing
+00ce94904987: Preparing
+0abe8dd131e9: Preparing
+2ef04ad74186: Preparing
+2fa9c904d3b3: Preparing
+0abe8dd131e9: Waiting
+2ef04ad74186: Waiting
+2fa9c904d3b3: Waiting
+180e4c252d03: Layer already exists
+00ce94904987: Layer already exists
+5f70bf18a086: Layer already exists
+63cace160565: Layer already exists
+780ab37d2c9e: Layer already exists
+0abe8dd131e9: Layer already exists
+2fa9c904d3b3: Layer already exists
+2ef04ad74186: Layer already exists
+7.2.1: digest: sha256:9fb00716d411adc5c340486c50fc89d2bbb8b12d6d10b3968b4bf0119a77f7d3 size: 2619
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Cleaning up Docker resources...
+[Pipeline] sh
++ sudo docker system prune -f
+Deleted build cache objects:
+7g9lg4t6710ans3mf0pyajjey
+5qjgosnw35jqc8gaumzvv4eaf
+
+Total reclaimed space: 874B
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS

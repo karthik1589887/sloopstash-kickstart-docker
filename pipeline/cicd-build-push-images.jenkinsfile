@@ -11,9 +11,9 @@ pipeline {
           script:'git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker',
           returnStatus:true
         )
-        }
       }
-      stage('CI: Build and Push Docker Images') {
+    }
+    stage('CI: Build and Push Docker Images') {
         steps {
           dir('kickstart-docker/test-image') {
             script {

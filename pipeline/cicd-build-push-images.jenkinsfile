@@ -4,24 +4,27 @@ pipeline {
     DOCKER_REPO = "karthik2502"
     DOCKER_USER = "karthik2502"
     DOCKER_PASS = "Work4@fun"
-    }
-    stages {
-        stage('CI: Download sources') {
+  }
+  
+  stages {
+    stage('CI: Download sources') {
+      steps {
         sh(
-          script:'git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker',
-          returnStatus:true
+          script: 'git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker',
+          returnStatus: true
         )
       }
     }
+    
     stage('CI: Build and Push Docker Images') {
-        steps {
-          dir('kickstart-docker/test-image') {
-            script {
-              // List top-level directories (e.g., nginx, redis)
-              def images = sh(script: "ls -d */", returnStdout: true).trim().split('\n')
+      steps {
+        dir('kickstart-docker/test-image') {
+          script {
+            // List top-level directories (e.g., nginx, redis)
+            def images = sh(script: "ls -d */", returnStdout: true).trim().split('\n')
 
-              // Loop through each image folder (e.g., nginx, redis)
-              images.each { imageFolder ->
+            // Loop through each image folder (e.g., nginx, redis)
+            images.each { imageFolder ->
               def imageName = imageFolder.replace('/', '')  // Remove trailing slash
 
               // List all versions inside the image folder
@@ -29,33 +32,34 @@ pipeline {
 
               // Loop through each version and build the Docker image
               versions.each { version ->
-              def dockerfilePath = "${imageFolder}${version}/amazon-linux-2.dockerfile"
-              def contextPath = "${imageFolder}${version}/context"
-              def imageTag = "${imageName}:${version}"
+                def dockerfilePath = "${imageFolder}${version}/amazon-linux-2.dockerfile"
+                def contextPath = "${imageFolder}${version}/context"
+                def imageTag = "${imageName}:${version}"
 
-              // Build Docker image
-              sh """
-                echo "Building ${DOCKER_REPO}/${imageTag}"
-                sudo docker build -t ${DOCKER_REPO}/${imageTag} -f ${dockerfilePath} ${contextPath}
+                // Build Docker image
+                sh """
+                  echo "Building ${DOCKER_REPO}/${imageTag}"
+                  sudo docker build -t ${DOCKER_REPO}/${imageTag} -f ${dockerfilePath} ${contextPath}
                 """
 
-              // Push Docker image
-              sh """
-                echo "Pushing ${DOCKER_REPO}/${imageTag}"
-                sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
-                sudo docker push ${DOCKER_REPO}/${imageTag}
+                // Push Docker image
+                sh """
+                  echo "Pushing ${DOCKER_REPO}/${imageTag}"
+                  sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
+                  sudo docker push ${DOCKER_REPO}/${imageTag}
                 """
-                  }
-                }
               }
             }
           }
         }
-     }
-    post {
-      always {
-        echo 'Cleaning up Docker resources...'
-        sh 'sudo docker system prune -f'
       }
     }
+  }
+
+  post {
+    always {
+      echo 'Cleaning up Docker resources...'
+      sh 'sudo docker system prune -f'
+    }
+  }
 }

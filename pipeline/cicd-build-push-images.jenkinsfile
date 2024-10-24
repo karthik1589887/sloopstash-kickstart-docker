@@ -7,9 +7,10 @@ pipeline {
     }
     stages {
         stage('CI: Download sources') {
-        steps {
-          sh 'git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker'
+        sh(
+          script:'git clone https://github.com/karthik1589887/sloopstash-kickstart-docker.git kickstart-docker',
           returnStatus:true
+        )
         }
       }
       stage('CI: Build and Push Docker Images') {
